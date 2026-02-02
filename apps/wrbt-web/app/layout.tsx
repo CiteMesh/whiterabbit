@@ -24,15 +24,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </div>
               <nav className="flex items-center gap-4 text-sm text-muted">
-                <Link href="/">Ingest</Link>
-                <Link href="/schema">Schema</Link>
+                <Link href="/" className="hover:text-text">Ingest</Link>
+                <Link href="/admin/bots" className="hover:text-text">Admin</Link>
+                <Link href="/schema" className="hover:text-text">Schema</Link>
                 <a
-                  href="https://vercel.com"
+                  href="https://github.com/CiteMesh/whiterabbit"
                   target="_blank"
                   rel="noreferrer"
-                  className="hidden sm:inline"
+                  className="hidden sm:inline hover:text-text"
                 >
-                  Vercel
+                  GitHub
                 </a>
               </nav>
             </div>

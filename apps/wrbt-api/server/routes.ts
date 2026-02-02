@@ -6,6 +6,7 @@ import { testConnection } from "./db";
 import { storage } from "./storage";
 import { botAuth, rateLimitByIP } from "./middleware/bot-auth";
 import botsRouter from "./routes/bots";
+import adminRouter from "./routes/admin";
 
 // Helper to safely extract string from query/params (Express can return string[], ParsedQs, etc.)
 function getString(value: unknown): string | undefined {
@@ -51,6 +52,12 @@ export async function registerRoutes(
       });
     }
   });
+
+  // ============================================================================
+  // Admin Routes (TODO: Add admin authentication middleware)
+  // ============================================================================
+
+  api.use('/admin', adminRouter);
 
   // ============================================================================
   // Bot Registration Routes (Public, Rate-Limited)

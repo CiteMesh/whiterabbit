@@ -32,6 +32,7 @@ export interface IStorage {
   // Bot methods
   createBot(bot: InsertBot & { pairing_code: string; pairing_expires_at: Date }): Promise<Bot>;
   getBotById(id: string): Promise<Bot | undefined>;
+  getAllBots(): Promise<Bot[]>;
   getBotByPairingCode(code: string): Promise<Bot | undefined>;
   getBotByToken(token: string): Promise<Bot | undefined>;
   updateBot(id: string, data: Partial<Bot>): Promise<void>;
@@ -39,7 +40,7 @@ export interface IStorage {
 
   // Bot request logging
   logBotRequest(data: Omit<BotRequest, 'id' | 'created_at'>): Promise<void>;
-  getBotRequests(botId: string, options: { limit: number; offset: number }): Promise<BotRequest[]>;
+  getBotRequests(botId: string, limit?: number, offset?: number): Promise<BotRequest[]>;
 
   // Document methods
   getPublicDocuments(options: { limit: number; offset: number }): Promise<Document[]>;
@@ -99,6 +100,13 @@ export class DbStorage implements IStorage {
     return result;
   }
 
+  async getAllBots(): Promise<Bot[]> {
+    const result = await db.query.bots.findMany({
+      orderBy: [desc(bots.created_at)],
+    });
+    return result;
+  }
+
   async getBotByPairingCode(code: string): Promise<Bot | undefined> {
     const result = await db.query.bots.findFirst({
       where: eq(bots.pairing_code, code),
@@ -143,11 +151,11 @@ export class DbStorage implements IStorage {
     await db.insert(bot_requests).values(data);
   }
 
-  async getBotRequests(botId: string, options: { limit: number; offset: number }): Promise<BotRequest[]> {
+  async getBotRequests(botId: string, limit: number = 50, offset: number = 0): Promise<BotRequest[]> {
     const result = await db.query.bot_requests.findMany({
       where: eq(bot_requests.bot_id, botId),
-      limit: options.limit,
-      offset: options.offset,
+      limit,
+      offset,
       orderBy: [desc(bot_requests.created_at)],
     });
     return result;
