@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@shared/*": ["./shared/*"],
+      "@wrbt/types": ["../../packages/types"]
+    }
+  },
+  "include": ["server/**/*", "shared/**/*", "script/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
