@@ -1,4 +1,9 @@
 import { randomBytes, randomInt } from 'crypto';
+import bcrypt from 'bcrypt';
+
+// bcrypt configuration
+const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
+const USE_BCRYPT = process.env.USE_BCRYPT === 'true' || process.env.NODE_ENV === 'production';
 
 /**
  * Generate a 6-digit pairing code for bot registration
@@ -26,19 +31,35 @@ export function generateUUID(): string {
 }
 
 /**
- * Hash an API key for storage (using bcrypt in production)
- * For now, returns plain text (REPLACE IN PRODUCTION)
+ * Hash an API key for storage using bcrypt
+ *
+ * In development (USE_BCRYPT=false), stores plain text for easier debugging.
+ * In production (NODE_ENV=production or USE_BCRYPT=true), uses bcrypt.
+ *
+ * @param key - Plain text API key to hash
+ * @returns Hashed key or plain text (development only)
  */
 export function hashApiKey(key: string): string {
-  // TODO: Use bcrypt.hash(key, 10) in production
-  return key;
+  if (USE_BCRYPT) {
+    return bcrypt.hashSync(key, SALT_ROUNDS);
+  } else {
+    console.warn('⚠️ DEVELOPMENT MODE: Using plain-text token storage. Set USE_BCRYPT=true or NODE_ENV=production for bcrypt.');
+    return key;
+  }
 }
 
 /**
  * Compare API key with hashed version
- * For now, simple comparison (REPLACE IN PRODUCTION)
+ *
+ * @param key - Plain text API key from request
+ * @param hash - Hashed key from database
+ * @returns true if keys match
  */
 export function compareApiKey(key: string, hash: string): boolean {
-  // TODO: Use bcrypt.compare(key, hash) in production
-  return key === hash;
+  if (USE_BCRYPT) {
+    return bcrypt.compareSync(key, hash);
+  } else {
+    // Development mode: plain text comparison
+    return key === hash;
+  }
 }
