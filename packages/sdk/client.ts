@@ -50,22 +50,23 @@ const handleJson = async <T>(path: string, init?: RequestInit): Promise<T> => {
 };
 
 export const ingest = async (payload: IngestRequest): Promise<IngestResponse> => {
-  return handleJson<IngestResponse>("/v1/ingest", {
+  return handleJson<IngestResponse>("/api/ingest", {
     method: "POST",
     body: JSON.stringify(payload)
   });
 };
 
 export const getDocument = async (id: string): Promise<Document> => {
-  return handleJson<Document>(`/v1/documents/${id}`);
+  return handleJson<Document>(`/api/documents/${id}`);
 };
 
 export const getChunks = async (id: string): Promise<ChunkListResponse> => {
-  return handleJson<ChunkListResponse>(`/v1/documents/${id}/chunks`);
+  return handleJson<ChunkListResponse>(`/api/documents/${id}/chunks`);
 };
 
 export const getSchemaReport = async (): Promise<SchemaReport> => {
-  return handleJson<SchemaReport>("/schema-report");
+  // TODO: Implement schema-report endpoint in backend
+  return handleJson<SchemaReport>("/api/schema-report");
 };
 
 export const getBaseUrl = () => normalizeBaseUrl();

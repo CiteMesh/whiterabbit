@@ -10,10 +10,9 @@ const starter = `Claude/OpenClaw friendly content goes here. Explain what the do
 
 export default function HomePage() {
   const [payload, setPayload] = useState<IngestRequest>({
-    org_id: "",
-    user_id: "",
     title: "",
-    content: starter
+    content: starter,
+    metadata: {}
   });
   const [result, setResult] = useState<IngestResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -27,10 +26,9 @@ export default function HomePage() {
     setError(null);
     try {
       const body: IngestRequest = {
-        org_id: payload.org_id || undefined,
-        user_id: payload.user_id || undefined,
+        content: payload.content,
         title: payload.title || undefined,
-        content: payload.content || ""
+        metadata: payload.metadata
       };
       const res = await ingest(body);
       setResult(res);
@@ -48,13 +46,14 @@ export default function HomePage() {
         <div className="text-sm uppercase tracking-wide text-muted">White Rabbit / WRBT_01</div>
         <h1 className="text-2xl font-semibold">Bot-first ingestion cockpit</h1>
         <p className="text-muted text-sm max-w-3xl">
-          Designed so ClaudeBots and OpenClaw operators can push documents, watch jobs move, and inspect chunks
-          without guessing. Contracts stay in specs/openapi.yaml; this UI only talks through the SDK.
+          Designed for ClaudeBots and OpenClaw operators to push documents with bot authentication.
+          Register your bot via <code className="bg-surface px-1 rounded">POST /api/bots/register</code>,
+          get admin approval, then use your Bearer token to ingest content.
         </p>
         <div className="flex gap-3 text-xs text-muted flex-wrap">
-          <span className="wrbt-pill">API-base: {process.env.NEXT_PUBLIC_WRBT_API_BASE || "unset"}</span>
-          <span className="wrbt-pill">Env: NEXT_PUBLIC_WRBT_API_BASE</span>
-          <span className="wrbt-pill">No service-role keys in client</span>
+          <span className="wrbt-pill">API-base: {process.env.NEXT_PUBLIC_WRBT_API_BASE || "http://localhost:5001"}</span>
+          <span className="wrbt-pill">Bot pairing-code auth</span>
+          <span className="wrbt-pill">Public read-only access</span>
         </div>
       </section>
 
@@ -68,34 +67,13 @@ export default function HomePage() {
             <div className="text-xs text-muted">{contentLength} chars</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="text-sm space-y-1">
-              <span className="text-muted">org_id (optional)</span>
-              <input
-                className="w-full bg-surface border border-border rounded-md px-3 py-2"
-                value={payload.org_id || ""}
-                onChange={(e) => setPayload((p) => ({ ...p, org_id: e.target.value }))}
-                placeholder="org_..."
-              />
-            </label>
-            <label className="text-sm space-y-1">
-              <span className="text-muted">user_id (optional)</span>
-              <input
-                className="w-full bg-surface border border-border rounded-md px-3 py-2"
-                value={payload.user_id || ""}
-                onChange={(e) => setPayload((p) => ({ ...p, user_id: e.target.value }))}
-                placeholder="user_..."
-              />
-            </label>
-          </div>
-
           <label className="text-sm space-y-1 block">
             <span className="text-muted">title (optional)</span>
             <input
               className="w-full bg-surface border border-border rounded-md px-3 py-2"
               value={payload.title || ""}
               onChange={(e) => setPayload((p) => ({ ...p, title: e.target.value }))}
-              placeholder="Short title"
+              placeholder="Short title for your document"
             />
           </label>
 
@@ -132,11 +110,11 @@ export default function HomePage() {
               <Link href="/schema" className="text-xs text-accent">View schema</Link>
             </div>
             <ul className="text-xs text-muted space-y-2 list-disc list-inside">
-              <li>Health: GET /healthz /readyz</li>
-              <li>Ingest: POST /v1/ingest → document_id + job_id</li>
-              <li>Status: GET /v1/documents/{"{id}"}</li>
-              <li>Chunks: GET /v1/documents/{"{id}"}/chunks</li>
-              <li>Introspection: GET /schema-report</li>
+              <li>Health: GET /api/healthz /api/readyz</li>
+              <li>Register: POST /api/bots/register → pairing_code</li>
+              <li>Ingest: POST /api/ingest → document_id + job_id</li>
+              <li>Status: GET /api/documents/{"{id}"}/status</li>
+              <li>Chunks: GET /api/documents/{"{id}"}/chunks</li>
             </ul>
           </div>
           {result && (

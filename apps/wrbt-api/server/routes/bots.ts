@@ -4,8 +4,10 @@ import { generatePairingCode, generateApiKey, hashApiKey } from '../utils/crypto
 import { rateLimitByIP } from '../middleware/bot-auth';
 
 // Helper to safely extract string from query/params
-function getString(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value;
+function getString(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
 }
 
 const router = Router();

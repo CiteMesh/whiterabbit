@@ -8,7 +8,7 @@ import { botAuth, rateLimitByIP } from "./middleware/bot-auth";
 import botsRouter from "./routes/bots";
 
 // Helper to safely extract string from query/params (Express can return string[], ParsedQs, etc.)
-function getString(value: string | string[] | ParsedQs | (string | ParsedQs)[] | undefined): string | undefined {
+function getString(value: unknown): string | undefined {
   if (typeof value === 'string') return value;
   if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
   return undefined;

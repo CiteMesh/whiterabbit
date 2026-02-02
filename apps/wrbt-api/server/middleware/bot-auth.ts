@@ -74,7 +74,7 @@ export async function botAuth(req: Request, res: Response, next: NextFunction) {
         method: req.method,
         status_code: res.statusCode,
         ip_address: req.ip || req.socket.remoteAddress || 'unknown',
-        user_agent: req.headers['user-agent'] || null,
+        user_agent: (req.headers['user-agent'] as string | undefined) ?? null,
         response_time_ms: responseTime,
       }).catch(err => console.error('Failed to log bot request:', err));
     });

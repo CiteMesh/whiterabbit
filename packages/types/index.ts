@@ -1,16 +1,16 @@
 export type JobStatus = "queued" | "processing" | "done" | "failed";
 
 export interface IngestRequest {
-  org_id?: string | null;
-  user_id?: string | null;
-  title?: string | null;
   content: string;
+  title?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface IngestResponse {
   document_id: string;
   job_id: string;
   status: JobStatus;
+  message?: string;
 }
 
 export interface Document {
