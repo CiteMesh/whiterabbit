@@ -1,8 +1,8 @@
 # WRBT_01 Development Status
 
-**Last Updated:** 2026-02-03
+**Last Updated:** 2026-02-03 (Latest)
 **Branch:** `wrbt01-v0.1-skeleton`
-**Status:** 🟢 Core implementation complete, ready for database setup and testing
+**Status:** 🟢 v0.2 - Admin UI + OpenAPI spec complete, ready for database testing
 
 ---
 
@@ -22,6 +22,8 @@
 - [x] Crypto utils (pairing codes, API keys)
 - [x] TypeScript compilation fixes
 - [x] Workspace integration (npm scripts)
+- [x] **NEW:** Admin API endpoints (list, approve, revoke bots)
+- [x] **NEW:** getAllBots() and updated getBotRequests() storage methods
 
 ### Frontend (apps/wrbt-web/)
 - [x] Next.js 14 App Router setup
@@ -32,6 +34,10 @@
 - [x] Tailwind CSS styling
 - [x] SDK integration
 - [x] Bot authentication documentation in UI
+- [x] **NEW:** Admin dashboard at /admin/bots
+- [x] **NEW:** Bot approval/revoke UI with one-click actions
+- [x] **NEW:** Bot stats cards (pending/approved/revoked counts)
+- [x] **NEW:** Real-time bot list with filtering
 
 ### Packages
 - [x] @wrbt/sdk - API client with typed methods
@@ -45,6 +51,8 @@
 - [x] IMPLEMENTATION_PLAN.md - Development roadmap (10 tasks)
 - [x] TESTING_GUIDE.md - API testing examples
 - [x] INTEGRATION_PLAN.md - Replit integration guide
+- [x] STATUS.md - Implementation progress tracking
+- [x] **NEW:** OpenAPI 3.1 spec at specs/openapi.yaml
 
 ### Infrastructure
 - [x] Monorepo structure (apps/, packages/, specs/)
@@ -76,9 +84,9 @@
 ## 🚧 TODO (From IMPLEMENTATION_PLAN.md)
 
 ### Phase 2: Core Security
-- [ ] **Task #5:** Add contract-first OpenAPI spec with security schemas
+- [x] **Task #5:** Add contract-first OpenAPI spec with security schemas ✅
 - [ ] **Task #6:** Implement session isolation with RLS policies
-- [ ] **Task #8:** Create SECURITY.md and GOVERNANCE.md
+- [ ] **Task #8:** Create SECURITY.md and GOVERNANCE.md (other agent working on this)
 
 ### Phase 3: Bot Integrations
 - [ ] **Task #9:** Add Discord bot integration endpoint
@@ -89,9 +97,10 @@
 - [ ] **Task #2:** Design bot-friendly scraper/crawler architecture (GraphQL, bulk export, webhooks)
 
 ### Admin UI
-- [ ] Create `/admin/bots` page for bot approval
-- [ ] Bot status dashboard
+- [x] Create `/admin/bots` page for bot approval ✅
+- [x] Bot status dashboard ✅
 - [ ] Audit log viewer
+- [ ] Admin authentication (currently unprotected - WARNING)
 
 ### Production Hardening
 - [ ] Implement bcrypt token hashing (`server/utils/crypto.ts` - TODO comments)
@@ -120,25 +129,35 @@
 
 ---
 
-## 🔄 Recent Changes (Last 3 Commits)
+## 🔄 Recent Changes (Last 5 Commits)
+
+### `4139e72` - feat(api): add OpenAPI 3.1 specification (NEW)
+- Create comprehensive OpenAPI spec at specs/openapi.yaml
+- Document all endpoints with request/response schemas
+- Add security schemas for Bearer token auth
+- Include authentication flow documentation
+- **Completes Task #5**
+
+### `be2418a` - feat(admin): add bot approval dashboard UI and API (NEW)
+- Create /admin/bots page with management UI
+- Add /api/admin/bots endpoints (list, approve, revoke)
+- One-click approve/revoke buttons
+- Bot stats cards (pending/approved/revoked counts)
+- Add getAllBots() storage method
+- **WARNING:** Admin endpoints currently unprotected
+
+### `6df7c73` - docs: add STATUS.md tracking implementation progress
+- Created STATUS.md to track all completed/pending work
+- Document success criteria and next steps
 
 ### `6d04d17` - docs: comprehensive README and frontend env configuration
 - Create detailed README.md with Quick Start guide
 - Document bot authentication flow with examples
 - List all API endpoints with auth requirements
-- Update frontend .env.example with clear comments
 
 ### `e0c3fbe` - feat(frontend): align SDK and UI with backend API
 - Update SDK endpoints from /v1/* to /api/*
 - Simplify IngestRequest to use bot auth model
-- Remove org_id/user_id fields (use bot identity instead)
-- Create SETUP_GUIDE.md
-
-### `31bb9b2` - fix(api): resolve TypeScript compilation errors
-- Remove Vite/static server dependencies (API-only backend)
-- Fix import paths from @shared/* to relative paths
-- Fix Express query param types (handle ParsedQs)
-- Convert undefined to null for user_agent logging
 
 ---
 
@@ -155,7 +174,7 @@
 - [ ] Admin can approve/revoke bots via UI
 - [ ] Documentation is complete and accurate
 
-**Current Score:** 2/10 criteria met
+**Current Score:** 3/10 criteria met (added Admin UI)
 
 ---
 
