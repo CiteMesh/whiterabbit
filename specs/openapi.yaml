@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: WRBT_01 API
+  version: 0.1.0
+  description: >-
+    Source-of-truth contracts for White Rabbit ingestion + introspection. Replit backend MUST
+    implement these routes; frontend and SDK consume only these shapes.
+servers:
+  - url: https://your-replit-backend.example.com
+    description: Replit backend base (replace in deployment)
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      responses:
+        '200':
+          description: Service is live
+  /readyz:
+    get:
+      summary: Readiness probe
+      responses:
+        '200':
+          description: Service is ready to accept traffic
+  /v1/ingest:
+    post:
+      summary: Ingest a document
+      description: Accept raw content, enqueue processing, and return document + job identifiers.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestRequest'
+      responses:
+        '200':
+          description: Ingest accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestResponse'
+  /v1/documents/{id}:
+    get:
+      summary: Fetch document status
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: Document status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '404':
+          description: Document not found
+  /v1/documents/{id}/chunks:
+    get:
+      summary: List document chunks
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: Ordered chunks for the document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  document_id:
+                    type: string
+                  chunks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Chunk'
+        '404':
+          description: Document not found
+  /schema-report:
+    get:
+      summary: Backend schema + contract report
+      description: Machine-consumable snapshot to detect drift between frontend/SDK and backend.
+      responses:
+        '200':
+          description: Schema report JSON
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Implementation-defined shape; MUST include keys used by contract check.
+  /openapi.yaml:
+    get:
+      summary: Serve this OpenAPI document
+      responses:
+        '200':
+          description: OpenAPI document
+          content:
+            application/yaml: {}
+components:
+  parameters:
+    DocumentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Document identifier returned by ingest
+  schemas:
+    IngestRequest:
+      type: object
+      required: [content]
+      properties:
+        org_id:
+          type: string
+          nullable: true
+        user_id:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        content:
+          type: string
+          description: Raw text content to ingest
+    IngestResponse:
+      type: object
+      required: [document_id, job_id, status]
+      properties:
+        document_id:
+          type: string
+        job_id:
+          type: string
+        status:
+          $ref: '#/components/schemas/JobStatus'
+    JobStatus:
+      type: string
+      enum: [queued, processing, done, failed]
+    Document:
+      type: object
+      required: [id, status]
+      properties:
+        id:
+          type: string
+        org_id:
+          type: string
+          nullable: true
+        user_id:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        job_id:
+          type: string
+          nullable: true
+        chunk_count:
+          type: integer
+          minimum: 0
+          nullable: true
+        error_code:
+          type: string
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+    Chunk:
+      type: object
+      required: [id, document_id, index, content]
+      properties:
+        id:
+          type: string
+        document_id:
+          type: string
+        index:
+          type: integer
+          minimum: 0
+        content:
+          type: string
+        token_count:
+          type: integer
+          minimum: 0
+          nullable: true
+        embedding_status:
+          type: string
+          nullable: true

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "allowJs": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@wrbt/sdk": ["packages/sdk"],
+      "@wrbt/sdk/*": ["packages/sdk/*"],
+      "@wrbt/types": ["packages/types"],
+      "@wrbt/types/*": ["packages/types/*"],
+      "@wrbt/ui": ["packages/ui"],
+      "@wrbt/ui/*": ["packages/ui/*"]
+    }
+  }
+}
