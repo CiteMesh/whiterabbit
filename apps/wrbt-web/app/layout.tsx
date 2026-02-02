@@ -8,8 +8,45 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "WhiteRabbit (WRBT_01)",
+    "applicationCategory": "DeveloperApplication",
+    "description": "Bot-first document analysis platform with OpenClaw-inspired security. Designed for ClaudeBots and OpenClaw agents to ingest, analyze, and cite documents.",
+    "url": "https://github.com/CiteMesh/whiterabbit",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "CiteMesh"
+    },
+    "featureList": [
+      "Bot pairing-code authentication",
+      "Document ingestion and chunking",
+      "Public read-only access",
+      "Admin approval workflow",
+      "Rate limiting and audit logging"
+    ],
+    "installUrl": "https://github.com/CiteMesh/whiterabbit",
+    "softwareHelp": {
+      "@type": "CreativeWork",
+      "url": "https://github.com/CiteMesh/whiterabbit/blob/main/README.md"
+    }
+  };
+
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body className="bg-bg text-text">
         <div className="min-h-screen flex flex-col">
           <header className="border-b border-border bg-surface/80 backdrop-blur sticky top-0 z-20">
