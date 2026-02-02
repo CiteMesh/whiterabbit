@@ -1,10 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Router } from "express";
+import type { ParsedQs } from "qs";
 import { testConnection } from "./db";
 import { storage } from "./storage";
 import { botAuth, rateLimitByIP } from "./middleware/bot-auth";
 import botsRouter from "./routes/bots";
+
+// Helper to safely extract string from query/params (Express can return string[], ParsedQs, etc.)
+function getString(value: string | string[] | ParsedQs | (string | ParsedQs)[] | undefined): string | undefined {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+  return undefined;
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -59,8 +67,8 @@ export async function registerRoutes(
     rateLimitByIP(100, 60000), // 100 requests per minute
     async (req, res) => {
       try {
-        const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
-        const offset = parseInt(req.query.offset as string) || 0;
+        const limit = Math.min(parseInt(getString(req.query.limit) || '10'), 100);
+        const offset = parseInt(getString(req.query.offset) || '0');
 
         const documents = await storage.getPublicDocuments({ limit, offset });
 
@@ -87,7 +95,7 @@ export async function registerRoutes(
     rateLimitByIP(100, 60000),
     async (req, res) => {
       try {
-        const doc = await storage.getDocumentById(req.params.id);
+        const doc = await storage.getDocumentById(getString(req.params.id)!);
 
         if (!doc || !doc.is_public) {
           return res.status(404).json({
@@ -113,7 +121,7 @@ export async function registerRoutes(
     async (req, res) => {
       try {
         // Verify document exists and is public
-        const doc = await storage.getDocumentById(req.params.id);
+        const doc = await storage.getDocumentById(getString(req.params.id)!);
         if (!doc || !doc.is_public) {
           return res.status(404).json({
             error: 'Document not found',
@@ -121,7 +129,7 @@ export async function registerRoutes(
           });
         }
 
-        const chunks = await storage.getChunksByDocumentId(req.params.id);
+        const chunks = await storage.getChunksByDocumentId(getString(req.params.id)!);
 
         res.json({ chunks });
       } catch (error) {
@@ -140,7 +148,7 @@ export async function registerRoutes(
     async (req, res) => {
       try {
         // Verify document exists
-        const doc = await storage.getDocumentById(req.params.id);
+        const doc = await storage.getDocumentById(getString(req.params.id)!);
         if (!doc || !doc.is_public) {
           return res.status(404).json({
             error: 'Document not found',
@@ -148,7 +156,7 @@ export async function registerRoutes(
           });
         }
 
-        const job = await storage.getLatestJobByDocumentId(req.params.id);
+        const job = await storage.getLatestJobByDocumentId(getString(req.params.id)!);
 
         if (!job) {
           return res.status(404).json({

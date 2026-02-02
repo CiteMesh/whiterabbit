@@ -3,6 +3,11 @@ import { storage } from '../storage';
 import { generatePairingCode, generateApiKey, hashApiKey } from '../utils/crypto';
 import { rateLimitByIP } from '../middleware/bot-auth';
 
+// Helper to safely extract string from query/params
+function getString(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 const router = Router();
 
 /**
@@ -86,7 +91,10 @@ router.get(
   rateLimitByIP(60, 3600000), // 60 requests per hour
   async (req, res) => {
     try {
-      const { code } = req.params;
+      const code = getString(req.params.code);
+      if (!code) {
+        return res.status(400).json({ error: 'Missing pairing code' });
+      }
 
       const bot = await storage.getBotByPairingCode(code);
 

@@ -1,4 +1,4 @@
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, asc } from 'drizzle-orm';
 import { db } from './db';
 import {
   type User,
@@ -16,7 +16,7 @@ import {
   chunks,
   document_jobs,
   bot_requests,
-} from '@shared/schema';
+} from '../shared/schema';
 import { generateApiKey, hashApiKey, compareApiKey } from './utils/crypto';
 
 // ============================================================================
@@ -180,7 +180,7 @@ export class DbStorage implements IStorage {
   async getChunksByDocumentId(documentId: string): Promise<Chunk[]> {
     const result = await db.query.chunks.findMany({
       where: eq(chunks.document_id, documentId),
-      orderBy: [(chunks, { asc }) => asc(chunks.position)],
+      orderBy: [asc(chunks.position)],
     });
     return result;
   }

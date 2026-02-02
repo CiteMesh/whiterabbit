@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
-import type { Bot } from '@shared/schema';
+import type { Bot } from '../../shared/schema';
 
 // Extend Express Request to include bot
 declare global {
@@ -39,7 +39,7 @@ export async function botAuth(req: Request, res: Response, next: NextFunction) {
         method: req.method,
         status_code: 403,
         ip_address: req.ip || req.socket.remoteAddress || 'unknown',
-        user_agent: req.headers['user-agent'],
+        user_agent: req.headers['user-agent'] || null,
         response_time_ms: 0,
       });
 
@@ -74,7 +74,7 @@ export async function botAuth(req: Request, res: Response, next: NextFunction) {
         method: req.method,
         status_code: res.statusCode,
         ip_address: req.ip || req.socket.remoteAddress || 'unknown',
-        user_agent: req.headers['user-agent'],
+        user_agent: req.headers['user-agent'] || null,
         response_time_ms: responseTime,
       }).catch(err => console.error('Failed to log bot request:', err));
     });
