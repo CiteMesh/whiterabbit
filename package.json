@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "whiterabbit-monorepo",
   "version": "0.1.0",
   "private": true,
@@ -23,6 +24,8 @@
 }
 
 {
+=======
+>>>>>>> origin/repo-overview
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
