@@ -1,5 +1,5 @@
 import { eq, and, desc, asc, isNull } from 'drizzle-orm';
-import { db } from './db';
+import { db } from './db.js';
 import {
   type User,
   type InsertUser,
@@ -19,8 +19,8 @@ import {
   document_jobs,
   bot_requests,
   bot_allowlist,
-} from '../shared/schema';
-import { generateApiKey, hashApiKey, compareApiKey } from './utils/crypto';
+} from '../shared/schema.js';
+import { generateApiKey, hashApiKey, compareApiKey } from './utils/crypto.js';
 
 // ============================================================================
 // Storage Interface

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { storage } from '../storage';
-import { generateApiKey, hashApiKey } from '../utils/crypto';
-import { requireAdmin } from '../middleware/admin-auth';
+import { storage } from '../storage.js';
+import { generateApiKey, hashApiKey } from '../utils/crypto.js';
+import { requireAdmin } from '../middleware/admin-auth.js';
 
 const router = Router();
 

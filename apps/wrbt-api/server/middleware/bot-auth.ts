@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
-import { storage } from '../storage';
-import type { Bot } from '../../shared/schema';
+import { storage } from '../storage.js';
+import type { Bot } from '../../shared/schema.js';
 
 // Extend Express Request to include bot
 declare global {

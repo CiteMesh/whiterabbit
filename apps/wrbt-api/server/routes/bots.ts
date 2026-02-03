@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { storage } from '../storage';
-import { generatePairingCode, generateApiKey, hashApiKey, getPairingCodeExpiry, isPairingCodeExpired } from '../utils/crypto';
-import { rateLimitByIP } from '../middleware/bot-auth';
+import { storage } from '../storage.js';
+import { generatePairingCode, generateApiKey, hashApiKey, getPairingCodeExpiry, isPairingCodeExpired } from '../utils/crypto.js';
+import { rateLimitByIP } from '../middleware/bot-auth.js';
 
 // Helper to safely extract string from query/params
 function getString(value: unknown): string | undefined {

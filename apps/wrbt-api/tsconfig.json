@@ -4,9 +4,9 @@
     "outDir": "./dist",
     "rootDir": ".",
     "noEmit": false,
-    "module": "ESNext",
+    "module": "Node16",
     "target": "ES2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node16",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "paths": {

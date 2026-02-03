@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schema from '../shared/schema';
+import * as schema from '../shared/schema.js';
 
 // Create PostgreSQL connection pool
 const pool = new Pool({
