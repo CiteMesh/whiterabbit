@@ -27,7 +27,7 @@ interface BotCardProps {
 
 export function BotCardNew({ bot, onClick }: BotCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => onClick(bot)}>
+    <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-all cursor-pointer group" onClick={() => onClick(bot)}>
       <div className="relative h-48 w-full overflow-hidden bg-muted">
          {bot.image ? (
            <Image
@@ -45,16 +45,16 @@ export function BotCardNew({ bot, onClick }: BotCardProps) {
             {bot.category}
          </Badge>
       </div>
-      <CardHeader className="p-4">
+      <CardHeader>
         <div className="flex justify-between items-start">
-          <div>
+          <div className="space-y-1">
             <CardTitle className="line-clamp-1 text-lg group-hover:text-primary transition-colors">{bot.name}</CardTitle>
-            <CardDescription className="line-clamp-1 text-xs mt-1">by {bot.author}</CardDescription>
+            <CardDescription className="line-clamp-1 text-xs">by {bot.author}</CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0 flex-grow">
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+      <CardContent className="flex-grow space-y-4">
+        <p className="text-sm text-muted-foreground line-clamp-3">
           {bot.description}
         </p>
         <div className="flex flex-wrap gap-1">
@@ -68,17 +68,17 @@ export function BotCardNew({ bot, onClick }: BotCardProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="p-4 border-t bg-muted/20 flex justify-between items-center text-xs text-muted-foreground">
+      <CardFooter className="border-t bg-muted/20 flex justify-between items-center text-xs text-muted-foreground">
         <div className="flex gap-4">
-          <div className="flex items-center gap-1 hover:text-foreground">
+          <div className="flex items-center gap-1 hover:text-foreground transition-colors">
             <Star className="h-3 w-3" />
             <span>{bot.stars}</span>
           </div>
-          <div className="flex items-center gap-1 hover:text-foreground">
+          <div className="flex items-center gap-1 hover:text-foreground transition-colors">
             <GitFork className="h-3 w-3" />
             <span>{bot.forks}</span>
           </div>
-          <div className="flex items-center gap-1 hover:text-foreground">
+          <div className="flex items-center gap-1 hover:text-foreground transition-colors">
             <Download className="h-3 w-3" />
             <span>{bot.downloads}</span>
           </div>
