@@ -1,8 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"],
-    "allowImportingTsExtensions": false
+    "types": [
+      "node"
+    ],
+    "allowImportingTsExtensions": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
@@ -10,7 +17,10 @@
     "**/*.tsx",
     "next.config.mjs",
     "postcss.config.js",
-    "tailwind.config.ts"
+    "tailwind.config.ts",
+    ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
