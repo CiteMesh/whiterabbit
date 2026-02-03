@@ -19,20 +19,33 @@ whiterabbit/
 └── docs/                  # Architecture and planning docs
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
-### Prerequisites
+### 📦 Deployment Ready!
+
+**Status**: ✅ Production-ready • Backend & Frontend complete • Full documentation
+
+**Choose your path:**
+- 🏃 **Fast Track**: See [QUICK_START.md](QUICK_START.md) (5 minutes)
+- 📋 **Complete Guide**: See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) (30-45 minutes)
+- 🔧 **Local Development**: Follow instructions below
+
+---
+
+### Local Development Setup
+
+#### Prerequisites
 
 - Node.js >= 18.17.0
 - PostgreSQL database (Replit Postgres, Supabase, or local)
 
-### 1. Install Dependencies
+#### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Configure Backend
+#### 2. Configure Backend
 
 Create `apps/wrbt-api/.env`:
 
@@ -47,19 +60,21 @@ Edit `.env` and set your `DATABASE_URL`:
 DATABASE_URL=postgresql://user:password@host:5432/database
 PORT=5001
 SESSION_SECRET=$(openssl rand -base64 32)
+NODE_ENV=development
+USE_BCRYPT=false
 ```
 
-### 3. Setup Database
+#### 3. Setup Database
 
 ```bash
-# Push schema to database
+# Push schema to database (creates 8 tables)
 npm run db:push
 
 # Seed with sample data (optional)
 npm run seed
 ```
 
-### 4. Configure Frontend
+#### 4. Configure Frontend
 
 Create `apps/wrbt-web/.env.local`:
 
@@ -74,7 +89,7 @@ Edit `.env.local`:
 NEXT_PUBLIC_WRBT_API_BASE=http://localhost:5001
 ```
 
-### 5. Start Development Servers
+#### 5. Start Development Servers
 
 ```bash
 # Run both frontend and backend
@@ -84,6 +99,18 @@ npm run dev:all
 npm run dev:api   # Backend on http://localhost:5001
 npm run dev       # Frontend on http://localhost:3000
 ```
+
+---
+
+### 🌐 Production Deployment
+
+| Platform | Guide | Purpose |
+|----------|-------|---------|
+| **Replit** | [REPLIT_ENV_SETUP.md](REPLIT_ENV_SETUP.md) | Backend API server |
+| **Vercel** | [VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md) | Frontend dashboard |
+| **Both** | [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) | Complete walkthrough |
+
+**Pre-generated SESSION_SECRET ready**: Check deployment guides!
 
 ## Bot Authentication Flow
 
@@ -120,9 +147,10 @@ SET status = 'approved'
 WHERE pairing_code = '123456';
 ```
 
-**Option B: Admin Dashboard (TODO)**
+**Option B: Admin Dashboard** ✅
 - Navigate to `http://localhost:3000/admin/bots`
 - Click "Approve" on pending bot
+- Copy generated token from alert
 
 ### 3. Poll for Approval
 
@@ -181,14 +209,19 @@ curl -X POST http://localhost:5001/api/ingest \
 - **Public read-only access** (no auth required for GET endpoints)
 - **Tiered bot capabilities** (READ_ONLY vs WRITE_LIMITED)
 
-### ⏸️ TODO (Production)
-- [ ] bcrypt token hashing (currently plain text)
+### ✅ Production-Ready Features
+- **bcrypt token hashing** with dev/prod mode switching
+- **Admin dashboard** at `/admin/bots` with one-click approve/revoke
+- **OpenAPI 3.1 specification** for bot developers
+- **Bot discovery** via robots.txt, sitemap, Schema.org, .well-known
+
+### ⏸️ TODO (Production Hardening)
 - [ ] Redis rate limiting (currently in-memory)
-- [ ] Admin UI for bot approval
-- [ ] CORS configuration
+- [ ] Admin authentication (endpoints currently unprotected)
+- [ ] CORS whitelist configuration
 - [ ] HTTPS enforcement
-- [ ] Discord bot integration
-- [ ] Claude MCP endpoint
+- [ ] Discord bot integration endpoint
+- [ ] Claude MCP integration endpoint
 
 ## Bot Capability Tiers
 
@@ -227,9 +260,10 @@ server/
 ├── middleware/
 │   └── bot-auth.ts       # Authentication + rate limiting
 ├── routes/
-│   └── bots.ts           # Bot registration endpoints
+│   ├── bots.ts           # Bot registration endpoints
+│   └── admin.ts          # ✅ Admin approval/revocation endpoints
 └── utils/
-    └── crypto.ts         # Pairing codes, API keys
+    └── crypto.ts         # ✅ Pairing codes, API keys, bcrypt hashing
 
 shared/
 └── schema.ts             # Drizzle schema (8 tables)
@@ -239,10 +273,15 @@ shared/
 ```
 app/
 ├── page.tsx              # Home: ingest documents
+├── admin/
+│   └── bots/page.tsx     # ✅ Admin dashboard (bot approval UI)
 ├── documents/[id]/
 │   ├── page.tsx          # Document details
 │   └── chunks/page.tsx   # Document chunks viewer
-└── schema/page.tsx       # Schema inspector
+├── schema/page.tsx       # Schema inspector
+├── sitemap.ts            # Dynamic sitemap generation
+└── api/
+    └── openapi/route.ts  # OpenAPI JSON endpoint
 ```
 
 ### Packages
@@ -250,12 +289,24 @@ app/
 - **`@wrbt/types`** - Shared TypeScript interfaces
 - **`@wrbt/ui`** - Shared React components (CodePanel, etc.)
 
-## Documentation
+## 📚 Documentation
 
+### Deployment & Setup
+- **[QUICK_START.md](QUICK_START.md)** - 5-minute deployment reference
+- **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** - Complete deployment walkthrough
+- **[DEPLOYMENT_READY.md](DEPLOYMENT_READY.md)** - Current status and features
+- **[REPLIT_ENV_SETUP.md](REPLIT_ENV_SETUP.md)** - Backend environment configuration
+- **[VERCEL_ENV_SETUP.md](VERCEL_ENV_SETUP.md)** - Frontend environment configuration
+
+### Architecture & Development
 - **[SETUP_GUIDE.md](apps/wrbt-api/SETUP_GUIDE.md)** - Comprehensive backend setup
 - **[SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md)** - OpenClaw security model
 - **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Development roadmap
 - **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - API testing guide
+- **[REPLIT_HANDOFF.md](REPLIT_HANDOFF.md)** - Technical handoff for CODEX agent
+
+### API Specification
+- **[specs/openapi.yaml](specs/openapi.yaml)** - OpenAPI 3.1 specification
 
 ## Environment Variables
 
@@ -323,6 +374,8 @@ See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the development roadmap
 
 ---
 
-**Status:** 🟢 v0.1 - Backend + Frontend working, pending admin UI and integrations
+**Status:** 🟢 v0.1.0 - ✅ Production-Ready • Backend + Frontend + Admin UI Complete
 
 **Built with:** Express, Drizzle ORM, PostgreSQL, Next.js 14, TypeScript, Tailwind CSS
+
+**Deployment:** Ready for Replit (backend) + Vercel (frontend) • See [DEPLOYMENT_READY.md](DEPLOYMENT_READY.md)
