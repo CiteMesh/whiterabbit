@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Navbar } from '@/components/navbar'
+import { Footer } from '@/components/footer'
 import { BotCardNew, Bot } from '@/components/bot-card-new'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -209,6 +210,8 @@ export default function Home() {
              </div>
          </div>
       </section>
+      
+      <Footer />
     </div>
   )
 }
