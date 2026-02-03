@@ -166,3 +166,37 @@ export const bot_integrations = pgTable("bot_integrations", {
 });
 
 export type BotIntegration = typeof bot_integrations.$inferSelect;
+
+// ============================================================================
+// Bot Allowlist (Pre-approved Platform Users)
+// ============================================================================
+
+export const bot_allowlist = pgTable("bot_allowlist", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  platform: text("platform").notNull(), // discord | slack | telegram | claude | github
+  platform_user_id: text("platform_user_id").notNull(),
+  platform_username: text("platform_username"),
+  tier: text("tier").notNull().default("READ_ONLY"), // READ_ONLY | WRITE_LIMITED
+  reason: text("reason"), // Why this user is allowlisted
+  added_by: varchar("added_by").references(() => users.id).notNull(),
+  expires_at: timestamp("expires_at"), // Optional expiry for temporary allowlist
+  revoked_at: timestamp("revoked_at"),
+  revoked_by: varchar("revoked_by").references(() => users.id),
+  revoked_reason: text("revoked_reason"),
+  metadata: jsonb("metadata"), // Extra platform-specific data
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const insertAllowlistSchema = createInsertSchema(bot_allowlist).pick({
+  platform: true,
+  platform_user_id: true,
+  platform_username: true,
+  tier: true,
+  reason: true,
+  added_by: true,
+  expires_at: true,
+});
+
+export type BotAllowlistEntry = typeof bot_allowlist.$inferSelect;
+export type InsertAllowlistEntry = z.infer<typeof insertAllowlistSchema>;

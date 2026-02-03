@@ -1,4 +1,4 @@
-import { eq, and, desc, asc } from 'drizzle-orm';
+import { eq, and, desc, asc, isNull } from 'drizzle-orm';
 import { db } from './db';
 import {
   type User,
@@ -10,12 +10,15 @@ import {
   type Chunk,
   type DocumentJob,
   type BotRequest,
+  type BotAllowlistEntry,
+  type InsertAllowlistEntry,
   users,
   bots,
   documents,
   chunks,
   document_jobs,
   bot_requests,
+  bot_allowlist,
 } from '../shared/schema';
 import { generateApiKey, hashApiKey, compareApiKey } from './utils/crypto';
 
@@ -37,6 +40,16 @@ export interface IStorage {
   getBotByToken(token: string): Promise<Bot | undefined>;
   updateBot(id: string, data: Partial<Bot>): Promise<void>;
   getBotsByStatus(status: string): Promise<Bot[]>;
+
+  // Pairing code rate limiting
+  countPendingPairingCodesByIP(ipAddress: string): Promise<number>;
+
+  // Bot allowlist methods
+  getAllowlistEntry(platform: string, platformUserId: string): Promise<BotAllowlistEntry | undefined>;
+  createAllowlistEntry(entry: InsertAllowlistEntry): Promise<BotAllowlistEntry>;
+  getAllowlist(): Promise<BotAllowlistEntry[]>;
+  revokeAllowlistEntry(id: string, revokedBy: string, reason: string): Promise<void>;
+  isUserAllowlisted(platform: string, platformUserId: string): Promise<boolean>;
 
   // Bot request logging
   logBotRequest(data: Omit<BotRequest, 'id' | 'created_at'>): Promise<void>;
@@ -146,6 +159,28 @@ export class DbStorage implements IStorage {
     return result;
   }
 
+  // Pairing code rate limiting
+  async countPendingPairingCodesByIP(ipAddress: string): Promise<number> {
+    // Count bots with pending status and valid (non-expired) pairing codes from this IP
+    // IP is stored in metadata.ip_address during pairing request
+    const pendingBots = await db.query.bots.findMany({
+      where: and(
+        eq(bots.status, 'pending'),
+      ),
+    });
+
+    // Filter for matching IP and non-expired codes
+    const now = new Date();
+    const validPendingFromIP = pendingBots.filter(bot => {
+      const metadata = bot.metadata as { ip_address?: string } | null;
+      const matchesIP = metadata?.ip_address === ipAddress;
+      const notExpired = bot.pairing_expires_at && bot.pairing_expires_at > now;
+      return matchesIP && notExpired;
+    });
+
+    return validPendingFromIP.length;
+  }
+
   // Bot request logging
   async logBotRequest(data: Omit<BotRequest, 'id' | 'created_at'>): Promise<void> {
     await db.insert(bot_requests).values(data);
@@ -205,6 +240,54 @@ export class DbStorage implements IStorage {
   async createDocumentJob(data: { document_id: string; status: string }): Promise<DocumentJob> {
     const [job] = await db.insert(document_jobs).values(data).returning();
     return job;
+  }
+
+  // Bot allowlist methods
+  async getAllowlistEntry(platform: string, platformUserId: string): Promise<BotAllowlistEntry | undefined> {
+    const result = await db.query.bot_allowlist.findFirst({
+      where: and(
+        eq(bot_allowlist.platform, platform),
+        eq(bot_allowlist.platform_user_id, platformUserId),
+        isNull(bot_allowlist.revoked_at),
+      ),
+    });
+    return result;
+  }
+
+  async createAllowlistEntry(entry: InsertAllowlistEntry): Promise<BotAllowlistEntry> {
+    const [allowlistEntry] = await db.insert(bot_allowlist).values(entry).returning();
+    return allowlistEntry;
+  }
+
+  async getAllowlist(): Promise<BotAllowlistEntry[]> {
+    const result = await db.query.bot_allowlist.findMany({
+      where: isNull(bot_allowlist.revoked_at),
+      orderBy: [desc(bot_allowlist.created_at)],
+    });
+    return result;
+  }
+
+  async revokeAllowlistEntry(id: string, revokedBy: string, reason: string): Promise<void> {
+    await db.update(bot_allowlist)
+      .set({
+        revoked_at: new Date(),
+        revoked_by: revokedBy,
+        revoked_reason: reason,
+        updated_at: new Date(),
+      })
+      .where(eq(bot_allowlist.id, id));
+  }
+
+  async isUserAllowlisted(platform: string, platformUserId: string): Promise<boolean> {
+    const entry = await this.getAllowlistEntry(platform, platformUserId);
+    if (!entry) return false;
+
+    // Check if expired (if expiry is set)
+    if (entry.expires_at && entry.expires_at < new Date()) {
+      return false;
+    }
+
+    return true;
   }
 
   // Health check
