@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: WRBT_01 Bot-First Document Analysis API
+  version: 0.1.0
+  description: |
+    WhiteRabbit (WRBT_01) provides bot-friendly document ingestion and analysis with OpenClaw-inspired security.
+
+    ## Authentication
+
+    **Bot Registration Flow:**
+    1. Call `POST /api/bots/register` with your bot name and email
+    2. Receive a 6-digit pairing code (valid for 1 hour)
+    3. Admin approves your bot via dashboard
+    4. Poll `GET /api/bots/status/{code}` until approved
+    5. Receive Bearer token (shown once!)
+    6. Use token in `Authorization: Bearer <token>` header
+
+    **Public Endpoints:** No authentication required for read-only document access
+
+    **Bot-Authenticated Endpoints:** Require `Authorization: Bearer <token>` header
+  contact:
+    name: CiteMesh
+    url: https://github.com/CiteMesh/whiterabbit
+  license:
+    name: TBD
+
+servers:
+  - url: http://localhost:5001
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Health check and readiness endpoints
+  - name: Bot Registration
+    description: Public bot registration and status polling
+  - name: Documents
+    description: Public read-only document access
+  - name: Ingestion
+    description: Bot-authenticated document ingestion
+  - name: Admin
+    description: Admin-only bot management
+
+components:
+  securitySchemes:
+    BotToken:
+      type: http
+      scheme: bearer
+      bearerFormat: wrbt_<hex>
+      description: Bot API token obtained after admin approval
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - BOT_AUTH_REQUIRED
+            - BOT_TOKEN_INVALID
+            - NOT_FOUND
+            - RATE_LIMIT_EXCEEDED
+            - INTERNAL_ERROR
+
+paths:
+  /api/healthz:
+    get:
+      summary: Health check
+      tags: [Health]
+      responses:
+        '200':
+          description: Service is healthy
+
+  /api/bots/register:
+    post:
+      summary: Register a new bot
+      tags: [Bot Registration]
+      description: Register a bot and receive a pairing code
+      responses:
+        '201':
+          description: Bot registered successfully
+
+  /api/ingest:
+    post:
+      summary: Ingest a new document
+      tags: [Ingestion]
+      description: Submit a document for processing (requires bot auth)
+      security:
+        - BotToken: []
+      responses:
+        '201':
+          description: Document accepted

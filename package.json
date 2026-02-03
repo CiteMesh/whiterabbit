@@ -1,4 +1,29 @@
 {
+  "name": "whiterabbit-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace apps/wrbt-web run dev",
+    "dev:api": "npm --workspace apps/wrbt-api run dev",
+    "dev:all": "npm run dev & npm run dev:api",
+    "build": "npm --workspace apps/wrbt-web run build",
+    "build:api": "npm --workspace apps/wrbt-api run build",
+    "lint": "npm --workspace apps/wrbt-web run lint",
+    "db:push": "npm --workspace apps/wrbt-api run db:push",
+    "seed": "npm --workspace apps/wrbt-api run seed",
+    "check": "npm --workspace apps/wrbt-api run check && npm --workspace apps/wrbt-web run lint"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
+
+{
+
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,

@@ -1,0 +1,48 @@
+# WhiteRabbit (WRBT_01) - Bot-Friendly Document Analysis Platform
+# We welcome well-behaved bots and crawlers
+
+# Default rules for all bots
+User-agent: *
+Allow: /
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 1
+
+# Specific rules for AI/ML bots
+User-agent: GPTBot
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 1
+
+User-agent: Claude-Web
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 1
+
+User-agent: Googlebot
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 1
+
+# OpenClaw-compatible bots (custom user-agent pattern)
+User-agent: OpenClaw/*
+Allow: /api/
+Allow: /documents/
+Crawl-delay: 0.5
+
+# Disallow admin pages from crawling
+User-agent: *
+Disallow: /admin/
+
+# Sitemap location
+Sitemap: https://wrbt.example.com/sitemap.xml
+
+# API documentation
+# OpenAPI spec available at: /api/openapi.json
+# Bot registration: POST /api/bots/register
+# See README.md for integration guide
