@@ -4,8 +4,8 @@ modules = ["nodejs-20"]
 run = "npm run dev:api"
 
 [deployment]
-build = ["sh", "-c", "npm install && npm --workspace apps/wrbt-api run build"]
-run = ["sh", "-c", "node start-api.js"]
+build = ["sh", "-c", "npm install && npm run build:api"]
+run = ["node", "start-api.js"]
 deploymentTarget = "cloudrun"
 
 [[ports]]
