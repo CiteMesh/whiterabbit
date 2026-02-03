@@ -75,7 +75,7 @@ app.use((req, res, next) => {
   });
 
   // API-only server (frontend is served separately from apps/wrbt-web)
-  const port = parseInt(process.env.PORT || "5001", 10);
+  const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(
     {
       port,
