@@ -1,171 +1,214 @@
-import { BotHeader } from '@/components/bot-header'
-import { BotSidebar } from '@/components/bot-sidebar'
-import { BotCard } from '@/components/bot-card'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendingUp, Clock, Star, Bot } from 'lucide-react'
+"use client"
 
-const featuredBots = [
+import React, { useState } from 'react'
+import { Navbar } from '@/components/navbar'
+import { BotCardNew, Bot } from '@/components/bot-card-new'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search, Sparkles, Filter } from "lucide-react"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+
+// Mock data - will be replaced with API calls to backend (NEXT_PUBLIC_WRBT_API_BASE)
+const mockBots: Bot[] = [
   {
-    name: 'GPT Assistant Pro',
-    description: 'Advanced conversational AI with multi-modal capabilities and context memory',
-    category: 'Chat Bot',
-    platforms: ['WhatsApp', 'Telegram'],
-    contributors: 47,
-    rating: 4.8
+    id: '1',
+    name: 'Instagram Scraper Pro',
+    description: 'Advanced Instagram data extraction tool with support for posts, stories, and user profiles. Handles rate limiting and proxies automatically.',
+    author: 'datascraper',
+    stars: 1234,
+    forks: 234,
+    downloads: 5678,
+    updatedAt: '2d ago',
+    category: 'Social Media',
+    tags: ['instagram', 'scraping', 'social-media', 'data-extraction'],
   },
   {
-    name: 'WorkflowMaster',
-    description: 'Automate complex business processes with intelligent task routing',
-    category: 'Task Automation',
-    platforms: ['Slack', 'Discord'],
-    contributors: 32,
-    rating: 4.6
+    id: '2',
+    name: 'Crypto Trading Bot',
+    description: 'Automated cryptocurrency trading bot with multiple strategy support. Connects to major exchanges via API.',
+    author: 'cryptodev',
+    stars: 2341,
+    forks: 445,
+    downloads: 8901,
+    updatedAt: '1w ago',
+    category: 'Finance',
+    tags: ['crypto', 'trading', 'bot', 'finance'],
   },
   {
-    name: 'DataSync Agent',
-    description: 'Real-time data processing and synchronization across multiple sources',
-    category: 'Data Processing',
-    platforms: ['Custom API'],
-    contributors: 28,
-    rating: 4.7
+    id: '3',
+    name: 'SEO Audit Tool',
+    description: 'Comprehensive SEO analysis tool that crawls websites and generates detailed reports on optimization opportunities.',
+    author: 'seomaster',
+    stars: 876,
+    forks: 123,
+    downloads: 3456,
+    updatedAt: '3d ago',
+    category: 'SEO',
+    tags: ['seo', 'audit', 'website', 'analytics'],
   },
   {
-    name: 'SupportBot 360',
-    description: 'AI-powered customer support with sentiment analysis and ticket routing',
-    category: 'Customer Support',
-    platforms: ['WhatsApp', 'Telegram', 'Slack'],
-    contributors: 56,
-    rating: 4.9
+    id: '4',
+    name: 'Email Validator',
+    description: 'Bulk email validation service that checks syntax, domain, and mailbox existence. Fast and reliable.',
+    author: 'emailpro',
+    stars: 654,
+    forks: 89,
+    downloads: 2345,
+    updatedAt: '5d ago',
+    category: 'Utilities',
+    tags: ['email', 'validation', 'bulk', 'verification'],
   },
   {
-    name: 'ContentCreator AI',
-    description: 'Generate blog posts, social media content, and marketing copy',
-    category: 'Content Generation',
-    platforms: ['Discord'],
-    contributors: 41,
-    rating: 4.5
+    id: '5',
+    name: 'E-commerce Price Monitor',
+    description: 'Track prices across multiple e-commerce platforms. Get alerts when prices drop below your target.',
+    author: 'pricetracker',
+    stars: 1543,
+    forks: 267,
+    downloads: 6789,
+    updatedAt: '1d ago',
+    category: 'E-commerce',
+    tags: ['e-commerce', 'price', 'monitoring', 'alerts'],
   },
   {
-    name: 'CodeReview Assistant',
-    description: 'Automated code review with best practices and security checks',
-    category: 'Development',
-    platforms: ['GitHub', 'GitLab'],
-    contributors: 62,
-    rating: 4.8
-  }
+    id: '6',
+    name: 'Content Generator AI',
+    description: 'AI-powered content generation bot for blogs, social media, and marketing materials. Uses latest LLM models.',
+    author: 'aiwriter',
+    stars: 3210,
+    forks: 543,
+    downloads: 12345,
+    updatedAt: '4h ago',
+    category: 'Marketing',
+    tags: ['ai', 'content', 'generation', 'llm'],
+  },
+  {
+    id: '7',
+    name: 'LinkedIn Auto Connect',
+    description: 'Automate LinkedIn connection requests with personalized messages. Smart targeting and rate limiting.',
+    author: 'linkedinpro',
+    stars: 987,
+    forks: 176,
+    downloads: 4321,
+    updatedAt: '1w ago',
+    category: 'Social Media',
+    tags: ['linkedin', 'networking', 'automation', 'outreach'],
+  },
+  {
+    id: '8',
+    name: 'API Testing Suite',
+    description: 'Comprehensive API testing framework with support for REST, GraphQL, and WebSocket protocols.',
+    author: 'tester123',
+    stars: 765,
+    forks: 134,
+    downloads: 2987,
+    updatedAt: '6d ago',
+    category: 'Testing',
+    tags: ['api', 'testing', 'automation', 'qa'],
+  },
 ]
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedBot, setSelectedBot] = useState<Bot | null>(null)
+
+  const handleBotClick = (bot: Bot) => {
+    setSelectedBot(bot)
+    console.log('[v0] Bot clicked:', bot.name)
+    // TODO: Navigate to bot detail page or open modal
+  }
+
+  const handleNavigate = (page: string) => {
+    console.log('[v0] Navigate to:', page)
+    // TODO: Implement routing or page state management
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <BotHeader />
+    <div className="flex flex-col min-h-screen">
+      <Navbar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery}
+        onNavigate={handleNavigate}
+        currentPage="home"
+      />
       
-      <div className="flex-1 flex">
-        <aside className="hidden md:block w-64 border-r border-border bg-muted/30">
-          <BotSidebar />
-        </aside>
-        
-        <main className="flex-1">
-          <div className="container max-w-6xl py-8 px-4 md:px-8">
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold tracking-tight mb-3 text-balance">
-                Welcome to OpenClaw Bot Wiki
-              </h1>
-              <p className="text-lg text-muted-foreground text-pretty max-w-3xl">
-                The comprehensive, community-driven database of AI agents and bots. 
-                Discover, learn about, and contribute to the growing ecosystem of intelligent automation.
-              </p>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-b from-primary/5 via-background to-background py-20 px-4">
+        <div className="container mx-auto max-w-4xl text-center space-y-6">
+          <Badge variant="secondary" className="mb-2">v2.0 Now Available</Badge>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter sm:text-5xl text-balance">
+            The Encyclopedia of <span className="text-primary">Bots</span>
+          </h1>
+          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl text-pretty">
+            Discover, share, and collaborate on automation scripts. The largest open-source database for OpenClaw bots.
+          </p>
+          <div className="flex w-full max-w-sm items-center space-x-2 mx-auto pt-4">
+            <div className="relative flex-1">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input type="text" placeholder="Search for bots, scrapers, automation..." className="pl-9 h-12" />
             </div>
-
-            <div className="grid gap-6 md:grid-cols-3 mb-8">
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border bg-card">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <Bot className="h-4 w-4" />
-                  Total Bots
-                </div>
-                <div className="text-3xl font-bold">1,247</div>
-                <p className="text-xs text-muted-foreground">+89 this month</p>
-              </div>
-              
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border bg-card">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <Star className="h-4 w-4" />
-                  Contributors
-                </div>
-                <div className="text-3xl font-bold">3,492</div>
-                <p className="text-xs text-muted-foreground">Active community</p>
-              </div>
-              
-              <div className="flex flex-col gap-2 p-4 rounded-lg border border-border bg-card">
-                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <TrendingUp className="h-4 w-4" />
-                  Updates Today
-                </div>
-                <div className="text-3xl font-bold">127</div>
-                <p className="text-xs text-muted-foreground">Last updated 2min ago</p>
-              </div>
-            </div>
-
-            <Tabs defaultValue="featured" className="space-y-6">
-              <TabsList>
-                <TabsTrigger value="featured" className="gap-2">
-                  <Star className="h-4 w-4" />
-                  Featured
-                </TabsTrigger>
-                <TabsTrigger value="trending" className="gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Trending
-                </TabsTrigger>
-                <TabsTrigger value="recent" className="gap-2">
-                  <Clock className="h-4 w-4" />
-                  Recent
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="featured" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {featuredBots.map((bot) => (
-                    <BotCard key={bot.name} {...bot} />
-                  ))}
-                </div>
-                <div className="flex justify-center pt-4">
-                  <Button variant="outline">Load More Bots</Button>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="trending" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {featuredBots.slice(0, 4).map((bot) => (
-                    <BotCard key={bot.name} {...bot} />
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="recent" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {featuredBots.slice(2).map((bot) => (
-                    <BotCard key={bot.name} {...bot} />
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            <div className="mt-12 rounded-lg border border-border bg-muted/30 p-6">
-              <h2 className="text-2xl font-bold mb-3">Contribute to OpenClaw Wiki</h2>
-              <p className="text-muted-foreground mb-4 text-pretty">
-                Help us build the most comprehensive bot database. Share your bot configurations, 
-                improve documentation, and help others discover powerful AI agents.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button>Add a Bot</Button>
-                <Button variant="outline">Edit Documentation</Button>
-                <Button variant="outline">Join Community</Button>
-              </div>
-            </div>
+            <Button size="lg" className="h-12">Search</Button>
           </div>
-        </main>
-      </div>
+          
+           <div className="flex flex-wrap justify-center gap-2 pt-4 text-sm text-muted-foreground">
+             <span>Popular:</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">Instagram Scraper</span>
+             <span>•</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">Crypto Trading</span>
+             <span>•</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">SEO Audit</span>
+           </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-yellow-500" />
+                    Featured Bots
+                </h2>
+            </div>
+            <div className="flex items-center gap-4">
+                 <Tabs defaultValue="all" className="w-[300px]">
+                    <TabsList>
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="trending">Trending</TabsTrigger>
+                        <TabsTrigger value="new">New</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+                <Button variant="outline" size="icon">
+                    <Filter className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {mockBots.map((bot) => (
+            <BotCardNew key={bot.id} bot={bot} onClick={handleBotClick} />
+          ))}
+        </div>
+        
+         <div className="flex justify-center mt-12">
+            <Button variant="outline" size="lg" onClick={() => handleNavigate('browse')}>View All Bots</Button>
+         </div>
+      </section>
+      
+      {/* Categories Section */}
+      <section className="bg-muted/30 py-16 px-4 mt-12">
+         <div className="container mx-auto">
+             <h2 className="text-2xl font-bold mb-8 text-center">Browse by Category</h2>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {['E-commerce', 'Social Media', 'Finance', 'Data Mining', 'Testing', 'Utilities', 'SEO', 'Marketing'].map((cat) => (
+                     <div key={cat} className="bg-background hover:bg-muted p-6 rounded-lg border text-center cursor-pointer transition-colors">
+                         <h3 className="font-semibold">{cat}</h3>
+                     </div>
+                 ))}
+             </div>
+         </div>
+      </section>
     </div>
   )
 }
