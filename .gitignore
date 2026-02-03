@@ -7,6 +7,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .vercel
+.DS_Store
+
+# Frontend build artifacts
 apps/wrbt-web/.next
 apps/wrbt-web/node_modules
-.DS_Store
+
+# Backend build artifacts
+apps/wrbt-api/dist
+apps/wrbt-api/node_modules
+*.tsbuildinfo
