@@ -135,76 +135,69 @@ export default function Home() {
       />
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-primary/8 via-primary/3 to-background py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
-        <div className="container mx-auto max-w-5xl text-center space-y-8 relative z-10">
-          <Badge variant="secondary" className="mb-2 px-4 py-1.5 text-xs font-medium">v2.0 Now Available</Badge>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight sm:text-6xl text-balance leading-tight">
-            The Encyclopedia of <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Bots</span>
+      <section className="bg-background py-16 px-4">
+        <div className="container mx-auto max-w-4xl text-center space-y-6">
+          <Badge variant="secondary" className="mb-2">v2.0 Now Available</Badge>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-balance">
+            The Encyclopedia of Bots
           </h1>
-          <p className="mx-auto max-w-[750px] text-muted-foreground text-lg md:text-xl text-pretty leading-relaxed">
+          <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg text-pretty">
             Discover, share, and collaborate on automation scripts. The largest open-source database for OpenClaw bots.
           </p>
-          <div className="flex w-full max-w-xl items-center gap-3 mx-auto pt-6">
-            <div className="relative flex-1">
-                <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
-                <Input 
-                  type="text" 
-                  placeholder="Search for bots, scrapers, automation..." 
-                  className="pl-12 h-14 text-base border-2 focus-visible:border-primary/50 rounded-xl" 
-                />
-            </div>
-            <Button size="lg" className="h-14 px-8 text-base font-medium rounded-xl shadow-lg shadow-primary/20">
-              Search
-            </Button>
+          <div className="flex w-full max-w-lg items-center gap-2 mx-auto pt-4">
+            <Input 
+              type="text" 
+              placeholder="Search for bots, scrapers, automation..." 
+              className="h-11" 
+            />
+            <Button className="h-11 px-6">Search</Button>
           </div>
           
-           <div className="flex flex-wrap justify-center gap-3 pt-6 text-sm text-muted-foreground items-center">
-             <span className="font-medium">Popular:</span>
-             <span className="cursor-pointer hover:text-primary hover:underline transition-colors px-2 py-1 rounded-md hover:bg-primary/5">Instagram Scraper</span>
-             <span className="text-border">•</span>
-             <span className="cursor-pointer hover:text-primary hover:underline transition-colors px-2 py-1 rounded-md hover:bg-primary/5">Crypto Trading</span>
-             <span className="text-border">•</span>
-             <span className="cursor-pointer hover:text-primary hover:underline transition-colors px-2 py-1 rounded-md hover:bg-primary/5">SEO Audit</span>
+           <div className="flex flex-wrap justify-center gap-2 pt-4 text-sm text-muted-foreground">
+             <span>Popular:</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">Instagram Scraper</span>
+             <span>•</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">Crypto Trading</span>
+             <span>•</span>
+             <span className="cursor-pointer hover:text-primary hover:underline">SEO Audit</span>
            </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-            <div className="flex items-center gap-3">
-                <h2 className="text-3xl font-bold flex items-center gap-3">
-                    <Sparkles className="h-6 w-6 text-primary" />
+      <section className="container mx-auto px-4 py-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-yellow-500" />
                     Featured Bots
                 </h2>
             </div>
             <div className="flex items-center gap-3">
                  <Tabs defaultValue="all" className="w-auto">
-                    <TabsList className="h-10">
-                        <TabsTrigger value="all" className="px-6">All</TabsTrigger>
-                        <TabsTrigger value="trending" className="px-6">Trending</TabsTrigger>
-                        <TabsTrigger value="new" className="px-6">New</TabsTrigger>
+                    <TabsList>
+                        <TabsTrigger value="all">All</TabsTrigger>
+                        <TabsTrigger value="trending">Trending</TabsTrigger>
+                        <TabsTrigger value="new">New</TabsTrigger>
                     </TabsList>
                 </Tabs>
-                <Button variant="outline" size="icon" className="h-10 w-10">
+                <Button variant="outline" size="icon">
                     <Filter className="h-4 w-4" />
                 </Button>
             </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {mockBots.map((bot) => (
             <BotCardNew key={bot.id} bot={bot} onClick={handleBotClick} />
           ))}
         </div>
         
-         <div className="flex justify-center mt-16">
+         <div className="flex justify-center mt-12">
             <Button 
               variant="outline" 
               size="lg" 
               onClick={() => handleNavigate('browse')}
-              className="h-12 px-8 text-base rounded-xl hover:bg-primary/5 hover:border-primary/50 hover:text-primary transition-all"
             >
               View All Bots
             </Button>
@@ -212,16 +205,16 @@ export default function Home() {
       </section>
       
       {/* Categories Section */}
-      <section className="bg-muted/40 py-20 px-4 mt-16">
+      <section className="bg-muted/30 py-16 px-4 mt-12">
          <div className="container mx-auto">
-             <h2 className="text-3xl font-bold mb-12 text-center">Browse by Category</h2>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+             <h2 className="text-2xl font-bold mb-8 text-center">Browse by Category</h2>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                  {['E-commerce', 'Social Media', 'Finance', 'Data Mining', 'Testing', 'Utilities', 'SEO', 'Marketing'].map((cat) => (
                      <div 
                        key={cat} 
-                       className="bg-card hover:bg-card/80 hover:border-primary/30 hover:shadow-md p-6 rounded-xl border-2 text-center cursor-pointer transition-all duration-300 hover:-translate-y-0.5 group"
+                       className="bg-background hover:bg-muted p-6 rounded-lg border text-center cursor-pointer transition-colors group"
                      >
-                         <h3 className="font-semibold text-base group-hover:text-primary transition-colors">{cat}</h3>
+                         <h3 className="font-semibold group-hover:text-primary transition-colors">{cat}</h3>
                      </div>
                  ))}
              </div>
