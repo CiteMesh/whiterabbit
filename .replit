@@ -1,1 +1,6 @@
 modules = ["nodejs-20"]
+
+[deployment]
+build = ["sh", "-c", "npm --workspace apps/wrbt-api run build"]
+run = ["sh", "-c", "npm --workspace apps/wrbt-api run start"]
+deploymentTarget = "cloudrun"
