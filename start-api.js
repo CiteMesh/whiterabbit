@@ -1,9 +1,6 @@
 #!/usr/bin/env node
-import { spawn } from 'child_process';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { spawn } = require('child_process');
+const { join } = require('path');
 
 const child = spawn('node', [join(__dirname, 'apps/wrbt-api/dist/index.js')], {
   stdio: 'inherit',
