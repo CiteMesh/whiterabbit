@@ -6,12 +6,16 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
 const USE_BCRYPT = process.env.USE_BCRYPT === 'true' || process.env.NODE_ENV === 'production';
 
 /**
- * Generate a secure uppercase pairing code for bot registration
- * Format: "ABCDEFGH" (6-8 uppercase characters A-Z)
- * Security: ~308 million combinations for 6 chars, ~208 billion for 8 chars
+ * Generate a secure uppercase alphabetic pairing code for bot registration
+ * Uses cryptographically secure randomBytes for unpredictability
  *
- * @param length - Code length (6-8 characters, defaults to 8)
- * @returns Uppercase alphabetic pairing code
+ * @param length - Length of code (6-8 characters). Default: 8
+ * @returns Uppercase alphabetic code (e.g., "ABCDEFGH")
+ *
+ * Security:
+ * - 6 chars: 308 million combinations (26^6)
+ * - 7 chars: 8 billion combinations (26^7)
+ * - 8 chars: 208 billion combinations (26^8)
  */
 export function generatePairingCode(length: number = 8): string {
   if (length < 6 || length > 8) {
@@ -23,7 +27,6 @@ export function generatePairingCode(length: number = 8): string {
   let code = '';
 
   for (let i = 0; i < length; i++) {
-    // Use cryptographically secure random bytes to index into alphabet
     code += ALPHABET[bytes[i] % ALPHABET.length];
   }
 
@@ -31,8 +34,7 @@ export function generatePairingCode(length: number = 8): string {
 }
 
 /**
- * Calculate pairing code expiry timestamp (1 hour from now)
- * @returns Date object 1 hour in the future
+ * Get expiry date for pairing code (1 hour from now)
  */
 export function getPairingCodeExpiry(): Date {
   const expiry = new Date();
@@ -42,8 +44,8 @@ export function getPairingCodeExpiry(): Date {
 
 /**
  * Check if a pairing code has expired
- * @param expiresAt - Expiry timestamp from database
- * @returns true if expired, false if still valid
+ * @param expiresAt - Expiry date to check
+ * @returns true if expired or null
  */
 export function isPairingCodeExpired(expiresAt: Date | null): boolean {
   if (!expiresAt) return true;
