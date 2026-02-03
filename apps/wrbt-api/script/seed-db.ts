@@ -7,9 +7,9 @@
  * - Sample public document with chunks
  */
 
-import { db, testConnection } from '../server/db';
-import { users, documents, chunks, document_jobs } from '../shared/schema';
-import { storage } from '../server/storage';
+import { db, testConnection } from '../server/db.js';
+import { users, documents, chunks, document_jobs } from '../shared/schema.js';
+import { storage } from '../server/storage.js';
 
 async function seed() {
   console.log('🌱 Seeding database...\n');

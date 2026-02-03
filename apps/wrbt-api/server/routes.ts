@@ -2,11 +2,11 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Router } from "express";
 import type { ParsedQs } from "qs";
-import { testConnection } from "./db";
-import { storage } from "./storage";
-import { botAuth, rateLimitByIP } from "./middleware/bot-auth";
-import botsRouter from "./routes/bots";
-import adminRouter from "./routes/admin";
+import { testConnection } from "./db.js";
+import { storage } from "./storage.js";
+import { botAuth, rateLimitByIP } from "./middleware/bot-auth.js";
+import botsRouter from "./routes/bots.js";
+import adminRouter from "./routes/admin.js";
 
 // Helper to safely extract string from query/params (Express can return string[], ParsedQs, etc.)
 function getString(value: unknown): string | undefined {
