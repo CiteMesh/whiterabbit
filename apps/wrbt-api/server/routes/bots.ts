@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { storage } from '../storage';
-import { generatePairingCode, generateApiKey, hashApiKey } from '../utils/crypto';
+import { generatePairingCode, generateApiKey, hashApiKey, getPairingCodeExpiry, isPairingCodeExpired } from '../utils/crypto';
 import { rateLimitByIP } from '../middleware/bot-auth';
 
 // Helper to safely extract string from query/params
@@ -25,6 +25,7 @@ router.post(
   async (req, res) => {
     try {
       const { name, contact_email, user_agent } = req.body;
+      const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
 
       // Validation
       if (!name || typeof name !== 'string' || name.trim().length < 3) {
@@ -42,17 +43,29 @@ router.post(
         });
       }
 
-      // Generate pairing code
-      const pairingCode = generatePairingCode(); // "123456"
-      const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+      // Check IP-based pairing code limit (max 3 pending codes per IP)
+      const pendingCount = await storage.countPendingPairingCodesByIP(ipAddress);
+      if (pendingCount >= 3) {
+        return res.status(429).json({
+          error: 'Too many pending pairing requests',
+          message: 'You have reached the maximum of 3 pending pairing codes from this IP address. Please wait for existing codes to be approved or expire.',
+          code: 'RATE_LIMIT_EXCEEDED',
+          pending_count: pendingCount,
+        });
+      }
 
-      // Create bot
+      // Generate secure uppercase pairing code (A-Z, 8 characters)
+      const pairingCode = generatePairingCode(8); // "ABCDEFGH"
+      const expiresAt = getPairingCodeExpiry(); // 1 hour from now
+
+      // Create bot with IP tracking in metadata
       const bot = await storage.createBot({
         name: name.trim(),
         contact_email: contact_email?.trim(),
         user_agent: user_agent || req.headers['user-agent'],
         pairing_code: pairingCode,
         pairing_expires_at: expiresAt,
+        metadata: { ip_address: ipAddress } as any,
       });
 
       return res.status(201).json({
@@ -60,6 +73,11 @@ router.post(
         status_url: `/api/bots/status/${pairingCode}`,
         expires_at: expiresAt.toISOString(),
         message: 'Pairing code generated. Poll status_url to check approval.',
+        security: {
+          max_pending_per_ip: 3,
+          current_pending: pendingCount + 1,
+          ttl_hours: 1,
+        },
         instructions: [
           '1. Share this pairing code with the WRBT_01 administrator',
           '2. Wait for admin approval (check status_url)',
@@ -109,10 +127,10 @@ router.get(
       }
 
       // Check if expired
-      if (bot.pairing_expires_at && new Date() > bot.pairing_expires_at) {
+      if (isPairingCodeExpired(bot.pairing_expires_at)) {
         return res.status(410).json({
           error: 'Pairing code expired',
-          message: 'This pairing code has expired. Please register again.',
+          message: 'This pairing code has expired (1 hour TTL). Please register again.',
           code: 'EXPIRED',
         });
       }

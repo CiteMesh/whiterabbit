@@ -6,11 +6,48 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
 const USE_BCRYPT = process.env.USE_BCRYPT === 'true' || process.env.NODE_ENV === 'production';
 
 /**
- * Generate a 6-digit pairing code for bot registration
- * Format: "123456"
+ * Generate a secure uppercase pairing code for bot registration
+ * Format: "ABCDEFGH" (6-8 uppercase characters A-Z)
+ * Security: ~308 million combinations for 6 chars, ~208 billion for 8 chars
+ *
+ * @param length - Code length (6-8 characters, defaults to 8)
+ * @returns Uppercase alphabetic pairing code
  */
-export function generatePairingCode(): string {
-  return String(randomInt(100000, 999999));
+export function generatePairingCode(length: number = 8): string {
+  if (length < 6 || length > 8) {
+    throw new Error('Pairing code length must be between 6 and 8 characters');
+  }
+
+  const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const bytes = randomBytes(length);
+  let code = '';
+
+  for (let i = 0; i < length; i++) {
+    // Use cryptographically secure random bytes to index into alphabet
+    code += ALPHABET[bytes[i] % ALPHABET.length];
+  }
+
+  return code;
+}
+
+/**
+ * Calculate pairing code expiry timestamp (1 hour from now)
+ * @returns Date object 1 hour in the future
+ */
+export function getPairingCodeExpiry(): Date {
+  const expiry = new Date();
+  expiry.setHours(expiry.getHours() + 1);
+  return expiry;
+}
+
+/**
+ * Check if a pairing code has expired
+ * @param expiresAt - Expiry timestamp from database
+ * @returns true if expired, false if still valid
+ */
+export function isPairingCodeExpired(expiresAt: Date | null): boolean {
+  if (!expiresAt) return true;
+  return new Date() > expiresAt;
 }
 
 /**

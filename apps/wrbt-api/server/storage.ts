@@ -38,6 +38,9 @@ export interface IStorage {
   updateBot(id: string, data: Partial<Bot>): Promise<void>;
   getBotsByStatus(status: string): Promise<Bot[]>;
 
+  // Pairing code rate limiting
+  countPendingPairingCodesByIP(ipAddress: string): Promise<number>;
+
   // Bot request logging
   logBotRequest(data: Omit<BotRequest, 'id' | 'created_at'>): Promise<void>;
   getBotRequests(botId: string, limit?: number, offset?: number): Promise<BotRequest[]>;
@@ -144,6 +147,28 @@ export class DbStorage implements IStorage {
       orderBy: [desc(bots.created_at)],
     });
     return result;
+  }
+
+  // Pairing code rate limiting
+  async countPendingPairingCodesByIP(ipAddress: string): Promise<number> {
+    // Count bots with pending status and valid (non-expired) pairing codes from this IP
+    // IP is stored in metadata.ip_address during pairing request
+    const pendingBots = await db.query.bots.findMany({
+      where: and(
+        eq(bots.status, 'pending'),
+      ),
+    });
+
+    // Filter for matching IP and non-expired codes
+    const now = new Date();
+    const validPendingFromIP = pendingBots.filter(bot => {
+      const metadata = bot.metadata as { ip_address?: string } | null;
+      const matchesIP = metadata?.ip_address === ipAddress;
+      const notExpired = bot.pairing_expires_at && bot.pairing_expires_at > now;
+      return matchesIP && notExpired;
+    });
+
+    return validPendingFromIP.length;
   }
 
   // Bot request logging
