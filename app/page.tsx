@@ -3,7 +3,7 @@ import { BotSidebar } from '@/components/bot-sidebar'
 import { BotCard } from '@/components/bot-card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendingUp, Clock, Star } from 'lucide-react'
+import { TrendingUp, Clock, Star, Bot } from 'lucide-react'
 
 const featuredBots = [
   {
