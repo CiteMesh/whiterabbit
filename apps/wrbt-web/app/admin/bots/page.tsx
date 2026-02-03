@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 interface Bot {
@@ -27,11 +27,7 @@ export default function AdminBotsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "revoked">("all");
 
-  useEffect(() => {
-    fetchBots();
-  }, [filter]);
-
-  const fetchBots = async () => {
+  const fetchBots = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -55,7 +51,11 @@ export default function AdminBotsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    fetchBots();
+  }, [fetchBots]);
 
   const approveBot = async (botId: string) => {
     try {
@@ -274,10 +274,10 @@ export default function AdminBotsPage() {
         <ol className="text-sm text-muted space-y-2 list-decimal list-inside">
           <li>Bot calls <code className="bg-surface px-1 rounded">POST /api/bots/register</code> with name and email</li>
           <li>Bot receives a 6-digit pairing code (valid for 1 hour)</li>
-          <li>Bot appears in "Pending Approval" above</li>
-          <li>Admin clicks "Approve" → bot receives Bearer token</li>
+          <li>Bot appears in &quot;Pending Approval&quot; above</li>
+          <li>Admin clicks &quot;Approve&quot; → bot receives Bearer token</li>
           <li>Bot uses token in <code className="bg-surface px-1 rounded">Authorization: Bearer &lt;token&gt;</code> header</li>
-          <li>Admin can revoke access anytime by clicking "Revoke"</li>
+          <li>Admin can revoke access anytime by clicking &quot;Revoke&quot;</li>
         </ol>
       </section>
     </div>

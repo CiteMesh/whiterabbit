@@ -19,5 +19,17 @@
   },
   "engines": {
     "node": ">=18.17.0"
+  },
+  "overrides": {
+    "esbuild": "^0.27.0",
+    "@esbuild-kit/core-utils@*": {
+      "esbuild": "^0.27.0"
+    },
+    "@esbuild-kit/esm-loader@*": {
+      "esbuild": "^0.27.0",
+      "@esbuild-kit/core-utils": {
+        "esbuild": "^0.27.0"
+      }
+    }
   }
 }
