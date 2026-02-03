@@ -1,0 +1,56 @@
+{
+  "name": "WhiteRabbit (WRBT_01)",
+  "version": "0.1.0",
+  "description": "Bot-first document analysis platform with OpenClaw-inspired security",
+  "api_base_url": "http://localhost:5001",
+  "documentation_url": "https://github.com/CiteMesh/whiterabbit",
+  "openapi_spec_url": "/api/openapi",
+  "authentication": {
+    "type": "bearer",
+    "flow": "pairing-code",
+    "registration_endpoint": "/api/bots/register",
+    "status_endpoint": "/api/bots/status/{code}",
+    "instructions": [
+      "1. POST /api/bots/register with {name, contact_email}",
+      "2. Receive 6-digit pairing code (expires in 1 hour)",
+      "3. Wait for admin approval",
+      "4. Poll GET /api/bots/status/{code} until approved",
+      "5. Receive Bearer token (shown once)",
+      "6. Use token in Authorization: Bearer <token> header"
+    ]
+  },
+  "endpoints": {
+    "health": "/api/healthz",
+    "readiness": "/api/readyz",
+    "documents": "/api/documents",
+    "ingest": "/api/ingest",
+    "bot_register": "/api/bots/register",
+    "bot_status": "/api/bots/status/{code}"
+  },
+  "rate_limits": {
+    "public_read": "100 requests/minute per IP",
+    "bot_registration": "3 requests/hour per IP",
+    "bot_status_polling": "60 requests/hour per IP",
+    "bot_write": "Varies by tier (READ_ONLY: 60/min, WRITE_LIMITED: 10/min)"
+  },
+  "bot_tiers": [
+    {
+      "name": "READ_ONLY",
+      "description": "Read-only access to public documents",
+      "rate_limit": "60 requests/minute",
+      "allowed_methods": ["GET"],
+      "allowed_endpoints": ["/api/documents", "/api/documents/{id}", "/api/documents/{id}/chunks"]
+    },
+    {
+      "name": "WRITE_LIMITED",
+      "description": "Read + limited write access for ingestion",
+      "rate_limit": "10 requests/minute",
+      "allowed_methods": ["GET", "POST"],
+      "allowed_endpoints": ["/api/documents", "/api/documents/{id}", "/api/documents/{id}/chunks", "/api/ingest"]
+    }
+  ],
+  "contact": {
+    "github": "https://github.com/CiteMesh/whiterabbit",
+    "issues": "https://github.com/CiteMesh/whiterabbit/issues"
+  }
+}
