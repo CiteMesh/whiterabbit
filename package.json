@@ -2,10 +2,7 @@
   "name": "whiterabbit-monorepo",
   "version": "0.1.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "npm --workspace apps/wrbt-web run dev",
     "dev:api": "npm --workspace apps/wrbt-api run dev",
@@ -17,7 +14,5 @@
     "seed": "npm --workspace apps/wrbt-api run seed",
     "check": "npm --workspace apps/wrbt-api run check && npm --workspace apps/wrbt-web run lint"
   },
-  "engines": {
-    "node": ">=18.17.0"
-  }
+  "engines": { "node": ">=18.17.0" }
 }
