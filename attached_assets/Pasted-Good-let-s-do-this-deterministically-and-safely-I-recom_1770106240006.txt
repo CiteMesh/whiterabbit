@@ -1,0 +1,189 @@
+Good — let’s do this deterministically and safely. I recommend we start with Option 1 — “Update Next.js now” (critical security fix), then run a focused audit and build/test. Below I give exact commands to run in the Replit shell (or any shell inside your workspace), safety notes, follow-ups and a small rollout plan (commit + PR). I can also prepare the package.json edits and PR text if you want me to — say “Prepare PR” and I’ll produce the diff/commit message ready to paste.
+
+⸻
+
+Plan (chosen: Option 1 — Update Next.js now)
+
+Goal: patch the Next.js vulnerability in apps/wrbt-web without breaking the workspace, run an audit, and verify builds/tests. If that succeeds, commit the lockfile and open a PR for review.
+
+Assumptions: workspace directories are apps/wrbt-web and apps/wrbt-api. Adjust paths if yours differ.
+
+⸻
+
+Step A — Quick safety checklist (run first)
+
+# from repo root
+# show current Node version (must be >= 18 for latest Next versions)
+node --version
+
+# confirm workspace folders exist
+ls -la apps/wrbt-web
+ls -la apps/wrbt-api
+
+If Node < 18, install/choose Node 18 in Replit or update the environment before proceeding.
+
+⸻
+
+Step B — Update Next.js (safe update to patched version)
+	1.	Pick the patched version. I recommend 15.1.6 (example). If you want latest instead, replace 15.1.6 with latest.
+
+# update Next.js in the web workspace
+npm --workspace apps/wrbt-web install next@15.1.6
+
+# ensure React/react-dom are compatible (adjust versions if your code needs another)
+npm --workspace apps/wrbt-web install react@^18.3.1 react-dom@^18.3.1
+
+Notes
+	•	If apps/wrbt-web/package.json pins a React version incompatible with Next 15.x, the npm install command will fail or upgrade react/react-dom accordingly. Inspect apps/wrbt-web/package.json before running, or run the installs above to bring them into a compatible range.
+	•	If your app actually targets Next 16 features, pick the exact version that matches those features. Use next@latest only if your repository is known to be compatible.
+
+⸻
+
+Step C — Run the security audit and try non-breaking fixes
+
+# run audit for that workspace
+npm --workspace apps/wrbt-web audit
+
+# attempt non-breaking fixes
+npm --workspace apps/wrbt-web audit fix
+
+# (only if you understand the risk) try force fixes (may upgrade majors)
+npm --workspace apps/wrbt-web audit fix --force
+
+Important: --force may bump major versions. Do not commit package-lock.json after --force without testing builds and tests.
+
+⸻
+
+Step D — Workspace install & normalise lockfiles
+
+If you use npm workspaces (recommended unless you and your team opted for pnpm):
+
+# from repo root, clean install for all workspaces
+npm install --workspaces
+
+If you see pnpm-lock.yaml in the root, you must choose a package manager. My preference for monorepos: pnpm. If you want to migrate to pnpm (optional), do this:
+
+# install pnpm (once)
+npm install -g pnpm
+
+# remove npm lockfiles to avoid conflicts
+rm -f package-lock.json apps/*/package-lock.json packages/*/package-lock.json
+
+# run pnpm install which will create pnpm-lock.yaml
+pnpm install
+
+If you keep npm, ensure pnpm-lock.yaml is removed or ignored and only package-lock.json is used.
+
+⸻
+
+Step E — Full clean (recommended if dependencies are messy)
+
+If installs fail or you see inconsistent node_modules:
+
+# destructive local clean (safe to run on Replit)
+rm -rf node_modules apps/*/node_modules packages/*/node_modules
+rm -f package-lock.json apps/*/package-lock.json packages/*/package-lock.json
+
+# fresh install using npm workspaces
+npm install --workspaces
+
+If migrating to pnpm, follow the pnpm steps in Step D instead of the npm install above.
+
+⸻
+
+Step F — Find and resolve deprecated transitive packages
+
+If audit or npm/PNPM warns about npmlog, gauge, tar etc.:
+
+# show which top-level packages bring them in (example)
+npm --workspace apps/wrbt-web ls npmlog
+npm --workspace apps/wrbt-web ls gauge
+npm --workspace apps/wrbt-web ls tar
+
+If npm ls indicates a top-level dependency some-dep@x.y.z depends on the deprecated package, update that top-level dependency:
+
+# update the top-level dependency to a newer version
+npm --workspace apps/wrbt-web install some-dep@latest
+
+Then re-run npm audit and npm run build.
+
+⸻
+
+Step G — Build & test to verify
+
+# test/build/typecheck for web app
+npm --workspace apps/wrbt-web run build
+npm --workspace apps/wrbt-web run test    # or npm --workspace apps/wrbt-web run test:unit
+
+# test/build for API
+npm --workspace apps/wrbt-api run build
+
+If any command fails, capture the error and file/line. Resolve the smallest possible delta (missing dev deps, type errors, or breaking API changes).
+
+⸻
+
+Step H — Commit the changes safely (create branch + PR)
+
+If everything builds/tests pass, commit the dependency changes:
+
+# create a branch
+git checkout -b chore/upgrade-deps-nextjs
+
+# stage package.json(s) and lockfile(s)
+git add apps/wrbt-web/package.json apps/wrbt-web/package-lock.json \
+        apps/wrbt-api/package.json apps/wrbt-api/package-lock.json \
+        package-lock.json
+
+git commit -m "chore(deps): upgrade Next.js (patch security) and compatible react/react-dom; run audit"
+git push origin chore/upgrade-deps-nextjs
+
+# create PR for review
+gh pr create --title "chore(deps): upgrade Next.js and workspace deps for security" \
+  --body "This PR upgrades Next.js in apps/wrbt-web to 15.1.6 (patched), updates react/react-dom to compatible versions if required, runs audits and verifies builds/tests." \
+  --base main
+
+If you moved to pnpm and generated a pnpm-lock.yaml, commit pnpm-lock.yaml and remove package-lock.json before committing. Add a note in PR body that package manager changed.
+
+⸻
+
+Replit-specific notes
+
+If deploying on Replit, update .replit so the run command and entrypoint match (apps/wrbt-web):
+
+.replit suggestions:
+
+run = "npm --workspace apps/wrbt-web run dev"
+entrypoint = "apps/wrbt-web/.vercel/build-output"    # or adjust to your app's entrypoint
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["npm", "run", "build"]
+
+Ensure Replit uses Node 18+ in .replit or Replit’s environment settings.
+
+⸻
+
+Safety & rollback
+	•	Don’t run npm audit fix --force on main without a PR and CI. If you must use --force, perform it on a feature branch and test thoroughly.
+	•	Keep the PR small: prefer updating only apps/wrbt-web first. If apps/wrbt-api also needs updates do a separate PR.
+	•	If anything breaks, revert the branch and push the previous lockfile, or create a rollback commit.
+
+⸻
+
+What I can do next (pick one)
+	1.	I will prepare the package.json edits + a PR body — I’ll produce the exact patch/diff for apps/wrbt-web/package.json and a commit message. Say: “Prepare PR”.
+	2.	I will produce a single-run shell script you can paste into the Replit shell to perform update → audit → build → commit automatically. Say: “Create script”.
+	3.	I will walk you through running the commands yourself interactively and help resolve any errors that appear. Say: “I’ll run” and paste back the failing logs.
+	4.	Do nothing for now — I’ll hold.
+
+⸻
+
+Recommended immediate next action
+
+Say “Prepare PR” if you want me to generate the exact package.json changes and the full PR text ready to commit (I’ll show the diff so you can review before you run anything).
+If you prefer to run it directly in Replit now, say “Create script” and I’ll provide a ready-to-run shell script that performs the update → audit → install → build → test → branch → commit steps (careful: the script will create commits; review before running).
+
+⸻
+
+If you want me to proceed now, tell me which of the four next actions above to perform. If “Prepare PR”, I’ll generate the edits and PR message immediately.
