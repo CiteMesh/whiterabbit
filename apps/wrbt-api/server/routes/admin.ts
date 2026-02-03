@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { storage } from '../storage';
 import { generateApiKey, hashApiKey } from '../utils/crypto';
+import { requireAdmin } from '../middleware/admin-auth';
 
 const router = Router();
+
+// Apply admin authentication to ALL routes in this router
+// IMPORTANT: Implement proper session-based auth before deploying to production
+// See middleware/admin-auth.ts for implementation notes
+router.use(requireAdmin);
 
 // Helper to safely extract string from params
 function getString(value: unknown): string | undefined {
@@ -10,12 +16,6 @@ function getString(value: unknown): string | undefined {
   if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
   return undefined;
 }
-
-/**
- * TODO: Add admin authentication middleware
- * For now, these endpoints are unprotected (development only)
- * In production, use Passport.js session auth
- */
 
 /**
  * GET /api/admin/bots

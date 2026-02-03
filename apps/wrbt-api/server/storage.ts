@@ -33,7 +33,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
 
   // Bot methods
-  createBot(bot: InsertBot & { pairing_code: string; pairing_expires_at: Date }): Promise<Bot>;
+  createBot(bot: InsertBot & { pairing_code: string; pairing_expires_at: Date; metadata?: any }): Promise<Bot>;
   getBotById(id: string): Promise<Bot | undefined>;
   getAllBots(): Promise<Bot[]>;
   getBotByPairingCode(code: string): Promise<Bot | undefined>;
