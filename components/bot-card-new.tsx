@@ -27,8 +27,11 @@ interface BotCardProps {
 
 export function BotCardNew({ bot, onClick }: BotCardProps) {
   return (
-    <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group" onClick={() => onClick(bot)}>
-      <div className="relative h-48 w-full overflow-hidden bg-muted">
+    <Card 
+      className="flex flex-col h-full overflow-hidden transition-all cursor-pointer group hover:shadow-lg" 
+      onClick={() => onClick(bot)}
+    >
+      <div className="relative h-40 w-full overflow-hidden bg-muted">
          {bot.image ? (
            <Image
               src={bot.image}
@@ -41,25 +44,25 @@ export function BotCardNew({ bot, onClick }: BotCardProps) {
              <span className="text-4xl font-bold text-primary/20">{bot.name[0]}</span>
            </div>
          )}
-         <Badge className="absolute top-2 right-2 bg-background/80 text-foreground hover:bg-background/90 backdrop-blur-sm">
+         <Badge className="absolute top-2 right-2 text-xs">
             {bot.category}
          </Badge>
       </div>
-      <CardHeader className="p-4">
+      <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="line-clamp-1 text-lg group-hover:text-primary transition-colors">{bot.name}</CardTitle>
+            <CardTitle className="line-clamp-1 text-base group-hover:text-primary transition-colors">{bot.name}</CardTitle>
             <CardDescription className="line-clamp-1 text-xs mt-1">by {bot.author}</CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0 flex-grow">
-        <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+      <CardContent className="flex-grow">
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
           {bot.description}
         </p>
         <div className="flex flex-wrap gap-1">
           {bot.tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5 font-normal">
+            <Badge key={tag} variant="secondary" className="text-xs px-2 py-0 font-normal">
               {tag}
             </Badge>
           ))}
@@ -68,19 +71,19 @@ export function BotCardNew({ bot, onClick }: BotCardProps) {
           )}
         </div>
       </CardContent>
-      <CardFooter className="p-4 border-t bg-muted/20 flex justify-between items-center text-xs text-muted-foreground">
-        <div className="flex gap-4">
-          <div className="flex items-center gap-1 hover:text-foreground">
+      <CardFooter className="border-t flex justify-between items-center text-xs text-muted-foreground">
+        <div className="flex gap-3">
+          <div className="flex items-center gap-1">
             <Star className="h-3 w-3" />
-            <span>{bot.stars}</span>
+            <span>{bot.stars.toLocaleString()}</span>
           </div>
-          <div className="flex items-center gap-1 hover:text-foreground">
+          <div className="flex items-center gap-1">
             <GitFork className="h-3 w-3" />
             <span>{bot.forks}</span>
           </div>
-          <div className="flex items-center gap-1 hover:text-foreground">
+          <div className="flex items-center gap-1">
             <Download className="h-3 w-3" />
-            <span>{bot.downloads}</span>
+            <span>{bot.downloads.toLocaleString()}</span>
           </div>
         </div>
         <div className="flex items-center gap-1">
